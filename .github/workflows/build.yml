@@ -1,0 +1,41 @@
+name: Build Executable
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '*.md'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install --upgrade webdriver-manager
+
+    - name: Install PyInstaller
+      run: pip install pyinstaller
+
+    - name: Build executable
+      run: |
+        pyinstaller --onefile --windowed --icon=assets/x.ico --name="xtract" main.py
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: xtract_v0.1
+        path: dist/xtract.exe
